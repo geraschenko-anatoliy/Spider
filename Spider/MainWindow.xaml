@@ -6,6 +6,8 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
@@ -37,11 +39,30 @@
             Grid.Column="1"
             Grid.Row="1"  >  
         </ListBox>
-        
         <ListBox
             Name="lbForErrors"
             Grid.Column="0"
             Grid.Row="2">
+        </ListBox>
+
+        <Button 
+            Name="SaveSinglePage"
+            Grid.Column="2"
+            Grid.Row="0"
+            Click="SaveSinglePage_Click">
+        </Button>
+        
+        <ListBox 
+            Name="lbLinksToImages"
+            Grid.Column="2"
+            Grid.Row="1">
+        </ListBox>
+        
+        <ListBox
+            Name="lbErrorsWithImagesDownloading"
+            Grid.Column="2"
+            Grid.Row="2"
+            >
         </ListBox>
     </Grid>
 </Window>

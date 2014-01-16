@@ -31,6 +31,9 @@ namespace Spider
 
         string path = @"http://wp7rocks.com/";
         string directoryPath;
+        string globalPath = @"F:\";
+        string currentFilePath;
+        string currentDirectoryPath;
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -73,25 +76,74 @@ namespace Spider
 
         private void PagesDownLoad_Click(object sender, RoutedEventArgs e)
         {
-            directoryPath = @"F:\" + path.Replace(@"/", "1").Replace(":", "2");
-            Directory.CreateDirectory(directoryPath);
+            //directoryPath = @"F:\" + path.Replace(@"/", "1").Replace(":", "2");
+            //Directory.CreateDirectory(directoryPath);
 
+            //foreach (var item in lbForSitePageLinks.Items)
+            //{
+            //    try
+            //    {
+            //        System.IO.File.Create(@"F:\http211wp7rocks.com1"+item+"1").Dispose();
+            //        string filePath = @"F:\http211wp7rocks.com1\" + item+"1.txt";
+            //        DownloadFile(item.ToString(), filePath.Replace(@"/", @"\"));
+            //        lbDownloadedPages.Items.Add(item);
 
-            foreach (var item in lbForSitePageLinks.Items)
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        lbForErrors.Items.Add(ex.Message);
+            //    }
+            //}
+
+            var document = new HtmlWeb().Load(path);
+            string header = document.DocumentNode.SelectSingleNode("//title").InnerHtml;
+            header = header.Replace('/',' ');
+
+            currentDirectoryPath = globalPath + header + "_files";
+
+            Directory.CreateDirectory(currentDirectoryPath);
+
+            currentFilePath = globalPath + @"\" + header + ".html";
+
+            File.WriteAllText(currentFilePath, String.Empty);
+
+            DownloadFile(path, currentFilePath);
+            lbDownloadedPages.Items.Add(File.ReadAllText(currentFilePath));
+        }
+
+        private void SaveSinglePage_Click(object sender, RoutedEventArgs e)
+        {
+            var document = new HtmlWeb().Load(path);
+            var urls = document.DocumentNode.Descendants("img")
+                                            .Select(e1 => e1.GetAttributeValue("src", null))
+                                            .Where(s => !String.IsNullOrEmpty(s));
+
+            lbLinksToImages.ItemsSource = urls;
+
+            string header = document.DocumentNode.SelectSingleNode("//title").InnerHtml;
+
+            //var results = from node in document.DocumentNode.Descendants()
+            //              where node.Name == "a" || node.Name == "img"
+            //              select node.InnerHtml;
+
+            WebClient Client = new WebClient();
+
+            foreach (var item in urls)
             {
                 try
                 {
-                    System.IO.File.Create(@"F:\http211wp7rocks.com1"+item+"1").Dispose();
-                    string filePath = @"F:\http211wp7rocks.com1\" + item+"1.txt";
-                    DownloadFile(item.ToString(), filePath.Replace(@"/",@"\"));
-                    lbDownloadedPages.Items.Add(item);
-
+                    if (item[0] == '/')
+                        Client.DownloadFile(path + item, currentDirectoryPath + @"\" + item.Substring(item.LastIndexOf('/') + 1, item.Length - item.LastIndexOf('/') - 1));
+                    else
+                        Client.DownloadFile(item, currentDirectoryPath + @"\" + item.Substring(item.LastIndexOf('/') + 1, item.Length - item.LastIndexOf('/') - 1));
                 }
                 catch (Exception ex)
                 {
-                    lbForErrors.Items.Add(ex.Message);
+                    lbErrorsWithImagesDownloading.Items.Add(ex.Message);
                 }
             }
+
+            //Client.DownloadFile("http://i.stackoverflow.com/Content/Img/stackoverflow-logo-250.png", @"C:\folder\stackoverflowlogo.png");
 
         }
     }
