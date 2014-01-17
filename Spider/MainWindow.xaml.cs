@@ -128,20 +128,37 @@ namespace Spider
 
             WebClient Client = new WebClient();
 
+            string tempHTML = File.ReadAllText(currentFilePath);
+
             foreach (var item in urls)
             {
                 try
                 {
                     if (item[0] == '/')
+                    {
                         Client.DownloadFile(path + item, currentDirectoryPath + @"\" + item.Substring(item.LastIndexOf('/') + 1, item.Length - item.LastIndexOf('/') - 1));
+                        string token = "./"+currentDirectoryPath.Substring(3, currentDirectoryPath.Length-3)+@"/" + item.Substring(item.LastIndexOf('/') + 1, item.Length - item.LastIndexOf('/') - 1);
+                        tempHTML = tempHTML.Replace(item, token);
+                    }
+
                     else
+                    {
                         Client.DownloadFile(item, currentDirectoryPath + @"\" + item.Substring(item.LastIndexOf('/') + 1, item.Length - item.LastIndexOf('/') - 1));
+                        string token = "./" + currentDirectoryPath.Substring(3, currentDirectoryPath.Length - 3) + @"/" + item.Substring(item.LastIndexOf('/') + 1, item.Length - item.LastIndexOf('/') - 1);
+                        tempHTML.Replace(item, token);
+                    }
                 }
                 catch (Exception ex)
                 {
                     lbErrorsWithImagesDownloading.Items.Add(ex.Message);
                 }
+                
+
             }
+
+            File.WriteAllText(currentFilePath, tempHTML);
+
+
 
             //Client.DownloadFile("http://i.stackoverflow.com/Content/Img/stackoverflow-logo-250.png", @"C:\folder\stackoverflowlogo.png");
 
