@@ -29,18 +29,18 @@ namespace Spider
             InitializeComponent();
         }
 
-        string path = @"http://wp7rocks.com/";
+        string path = "http://terrikon.com/football"; // @"http://wp7rocks.com/";
         string directoryPath;
         string globalPath = @"F:\";
         string currentFilePath;
         string currentDirectoryPath;
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            string temp = @"F:\myfile.txt";
-            DownloadFile(path, temp);
-            //tbForSitePage.Text = temp;
-        }
+        //private void Button_Click(object sender, RoutedEventArgs e)
+        //{
+        //    string temp = @"F:\myfile.txt";
+        //    DownloadFile(path, temp);
+        //    //tbForSitePage.Text = temp;
+        //}
         public static void DownloadFile(string remoteFilename, string localFilename)
         {
             WebClient client = new WebClient();
@@ -97,7 +97,8 @@ namespace Spider
 
             var document = new HtmlWeb().Load(path);
             string header = document.DocumentNode.SelectSingleNode("//title").InnerHtml;
-            header = header.Replace('/',' ');
+            //header = header.Replace('/',' ');
+            ReplaceAllIllegalCharacters(ref header);
 
             currentDirectoryPath = globalPath + header + "_files";
 
@@ -111,9 +112,39 @@ namespace Spider
             lbDownloadedPages.Items.Add(File.ReadAllText(currentFilePath));
         }
 
+        private void ReplaceAllIllegalCharacters(ref string title)
+        {
+            title = title.Replace(':',' ');
+            title = title.Replace('/', ' ');
+            //title.Replace('\', ' ');
+            title = title.Replace('*', ' ');
+            title = title.Replace('"', ' ');
+            title = title.Replace('>', ' ');
+            title = title.Replace('<', ' ');
+            title = title.Replace('|', ' ');
+        }
+
         private void SaveSinglePage_Click(object sender, RoutedEventArgs e)
         {
-            var document = new HtmlWeb().Load(path);
+            DownloadCss(path);
+            DownloadPage(path);
+        }
+
+        private void DownloadCss(string page_path)
+        {
+            var document = new HtmlWeb().Load(page_path);
+            var urls = document.DocumentNode.Descendants("link")
+                                            .Select(e1 => e1.GetAttributeValue("src", null))
+                                            .Where(s => !String.IsNullOrEmpty(s));
+
+            string f = "";
+
+        }
+
+        private void DownloadPage(string page_path)
+        {
+            var document = new HtmlWeb().Load(page_path);
+
             var urls = document.DocumentNode.Descendants("img")
                                             .Select(e1 => e1.GetAttributeValue("src", null))
                                             .Where(s => !String.IsNullOrEmpty(s));
@@ -122,13 +153,10 @@ namespace Spider
 
             string header = document.DocumentNode.SelectSingleNode("//title").InnerHtml;
 
-            //var results = from node in document.DocumentNode.Descendants()
-            //              where node.Name == "a" || node.Name == "img"
-            //              select node.InnerHtml;
-
-            WebClient Client = new WebClient();
-
             string tempHTML = File.ReadAllText(currentFilePath);
+
+            string tempPathForCurrentImage = "";
+            string token = "";
 
             foreach (var item in urls)
             {
@@ -136,33 +164,59 @@ namespace Spider
                 {
                     if (item[0] == '/')
                     {
-                        Client.DownloadFile(path + item, currentDirectoryPath + @"\" + item.Substring(item.LastIndexOf('/') + 1, item.Length - item.LastIndexOf('/') - 1));
-                        string token = "./"+currentDirectoryPath.Substring(3, currentDirectoryPath.Length-3)+@"/" + item.Substring(item.LastIndexOf('/') + 1, item.Length - item.LastIndexOf('/') - 1);
+                        tempPathForCurrentImage = currentDirectoryPath + @"\" + item.Substring(item.LastIndexOf('/') + 1, item.Length - item.LastIndexOf('/') - 1);         
+                        DownloadRemoteImageFile(page_path + item, tempPathForCurrentImage);
+                        token = "./"+currentDirectoryPath.Substring(3, currentDirectoryPath.Length-3)+@"/" + item.Substring(item.LastIndexOf('/') + 1, item.Length - item.LastIndexOf('/') - 1);
                         tempHTML = tempHTML.Replace(item, token);
                     }
-
                     else
                     {
-                        Client.DownloadFile(item, currentDirectoryPath + @"\" + item.Substring(item.LastIndexOf('/') + 1, item.Length - item.LastIndexOf('/') - 1));
-                        string token = "./" + currentDirectoryPath.Substring(3, currentDirectoryPath.Length - 3) + @"/" + item.Substring(item.LastIndexOf('/') + 1, item.Length - item.LastIndexOf('/') - 1);
-                        tempHTML.Replace(item, token);
+                        tempPathForCurrentImage = currentDirectoryPath + @"\" + item.Substring(item.LastIndexOf('/') + 1, item.Length - item.LastIndexOf('/') - 1);
+                        if (tempPathForCurrentImage.LastIndexOf('?') != -1)
+                        {
+                            DownloadRemoteImageFile(item, tempPathForCurrentImage.Substring(0, tempPathForCurrentImage.LastIndexOf('?')));
+                        }
+                        else
+                        {
+                            DownloadRemoteImageFile(item, tempPathForCurrentImage);
+                        }                        
+                        token = "./" + currentDirectoryPath.Substring(3, currentDirectoryPath.Length - 3) + @"/" + item.Substring(item.LastIndexOf('/') + 1, item.Length - item.LastIndexOf('/') - 1);
                     }
+                    tempHTML = tempHTML.Replace(item, token);
                 }
                 catch (Exception ex)
                 {
                     lbErrorsWithImagesDownloading.Items.Add(ex.Message);
                 }
-                
-
             }
-
             File.WriteAllText(currentFilePath, tempHTML);
-
-
-
-            //Client.DownloadFile("http://i.stackoverflow.com/Content/Img/stackoverflow-logo-250.png", @"C:\folder\stackoverflowlogo.png");
-
         }
+
+
+        private static void DownloadRemoteImageFile(string uri, string fileName)
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
+            if ((response.StatusCode == HttpStatusCode.OK ||
+                response.StatusCode == HttpStatusCode.Moved ||
+                response.StatusCode == HttpStatusCode.Redirect) &&
+                response.ContentType.StartsWith("image", StringComparison.OrdinalIgnoreCase))
+            {
+                using (Stream inputStream = response.GetResponseStream())
+                using (Stream outputStream = File.OpenWrite(fileName))
+                {
+                    byte[] buffer = new byte[4096];
+                    int bytesRead;
+                    do
+                    {
+                        bytesRead = inputStream.Read(buffer, 0, buffer.Length);
+                        outputStream.Write(buffer, 0, bytesRead);
+                    } while (bytesRead != 0);
+                }
+            }
+        }
+
     }
 }
 
