@@ -19,8 +19,10 @@
             Name="PagesDownLoadBtn"
             Grid.Column="0"
             Grid.Row="0"
-            Content="Скачать страницу" 
-            Click="PagesDownLoad_Click">
+            Content="Скачать страницу"
+            Click="PagesDownloadBtn"
+            >
+            
         </Button>
         <Button 
             Name="PageLinksScanBtn"
