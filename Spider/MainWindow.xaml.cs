@@ -142,7 +142,9 @@ namespace Spider
                         {
                             DownloadRemoteFile(path + item, currentDirectoryPath + item.Substring(item.LastIndexOf("/"), item.Length - item.LastIndexOf("/")), "text/html");
                         }
-                        tempHTML = tempHTML.Replace(@item, @item.Substring(1, item.Length - 1)); // МЕТАМОРФОЗЫ КАКИЕ-то
+                        //string t_item = "=\""+item;
+                        //t_item = t_item[0] + t_item.Substring(2, t.item.length - 2);
+                        tempHTML = tempHTML.Replace("=\"" + item, "=\"" + item.Substring(1, item.Length - 1)); // МЕТАМОРФОЗЫ КАКИЕ-то
                     }
                     else
                     {
