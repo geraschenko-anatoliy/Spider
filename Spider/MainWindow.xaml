@@ -19,7 +19,7 @@
             Name="PagesDownLoadBtn"
             Grid.Column="0"
             Grid.Row="0"
-            Content="Скачать страницу"
+            Content="Скачать страницы сайта"
             Click="PagesDownloadBtn"
             >
             
@@ -48,7 +48,7 @@
         </ListBox>
 
         <Button 
-            Name="SaveSinglePage"
+            Name="SaveSinglePageBtn"
             Grid.Column="2"
             Grid.Row="0"
             Click="SaveSinglePage_Click">

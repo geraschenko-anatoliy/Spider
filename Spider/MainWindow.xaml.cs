@@ -29,7 +29,7 @@ namespace Spider
             InitializeComponent();
         }
 
-        string path = @"http://wp7rocks.com/"; //"http://terrikon.com";
+        string path = @"http://terrikon.com"; //"http://wp7rocks.com/"; //;
         string directoryPath;
         string globalPath = @"F:\";
         string currentFilePath;
@@ -67,7 +67,13 @@ namespace Spider
                 HtmlDocument doc = hw.Load(path);
                 foreach (HtmlNode link in doc.DocumentNode.SelectNodes("//a[@href]"))
                 {
-                    lbForSitePageLinks.Items.Add(link.GetAttributeValue("href", null)) ;
+                    string temp = link.GetAttributeValue("href", null) ;
+                    lbForSitePageLinks.Items.Add(temp);
+                    if ((temp[0] == '/') && (temp != "/"))
+                    {
+                        //SaveSinglePage(path + link.GetAttributeValue("href", null));
+                        SaveSinglePage(path);
+                    }
                 }
             }
         }
@@ -110,16 +116,24 @@ namespace Spider
 
         private void SaveSinglePage_Click(object sender, RoutedEventArgs e)
         {
+            SaveSinglePage(path);
+        }
+
+        private void SaveSinglePage(string path)
+        {
+            ScanForLinks(path);
             DownloadHTML(path);
             DownloadCSS(path);
             DownloadJS(path);
             DownloadLess(path);
             DownloadImages(path);
         }
+
         private void DownloadHTML(string page_path)
         {
+            //var documenL = new HtmlWeb().Load("http://wp7rocks.com");
             var document = new HtmlWeb().Load(page_path);
-            var urls = document.DocumentNode.SelectNodes("//a[@href]")
+            var urls = document.DocumentNode.SelectNodes("link")
                                             .Select(e1 => e1.GetAttributeValue("href", null))
                                             .Where(s => !String.IsNullOrEmpty(s));
 
@@ -158,9 +172,6 @@ namespace Spider
             }
             File.WriteAllText(currentFilePath, tempHTML);
         }
-
-
-
         private void DownloadLess(string page_path)
         {
             var document = new HtmlWeb().Load(page_path);
