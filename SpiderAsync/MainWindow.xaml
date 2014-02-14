@@ -57,7 +57,7 @@
             <ComboBoxItem>4</ComboBoxItem>
             <ComboBoxItem>Бесконечность</ComboBoxItem>
         </ComboBox>
-        <ComboBox 
+        <!--<ComboBox 
             Name="ExternalLinksCB"
             Grid.Column="2"
             Grid.Row="1"
@@ -65,7 +65,17 @@
             >
             <ComboBoxItem>0</ComboBoxItem>
             <ComboBoxItem>1</ComboBoxItem>
-        </ComboBox>
+        </ComboBox>-->
+        
+        <TextBox
+            Name="globalPathBT" 
+            Grid.Column="2"
+            Grid.Row="1"
+            FontSize="20"
+            VerticalContentAlignment="Center"
+            Text="F://"
+            >   
+        </TextBox>
 
        
         <TextBox
@@ -84,7 +94,7 @@
             Grid.Column="2">
         </TextBox>
         <TextBox
-            Name="nDownloadedPagesTB"
+            Name="nDownloadedSourcesTB"
             VerticalAlignment="Center"
             Grid.Row="3"
             Grid.Column="0">
@@ -95,7 +105,12 @@
             Grid.Row="3"
             Grid.Column="1">
         </TextBox>
-
+        <TextBox
+            Name="nErrorListTB"
+            VerticalAlignment="Center"
+            Grid.Row="3"
+            Grid.Column="2">
+        </TextBox>
 
     </Grid>
 </Window>
