@@ -10,54 +10,55 @@ namespace Spider2
 {
     public class HDDWorker
     {
+        static readonly object locker = new object();
+
         public static string PrepareHDD(Uri uri, Uri siteURI, Uri hardURI, string fileType)
         {
             string SourceDataPath;
             string SourceFolderPath;
+
             if (uri.Host == siteURI.Host)
             {
-                //if (uri.IsFile == true)
-                    SourceFolderPath = hardURI.LocalPath + siteURI.Host + @"\" + uri.AbsolutePath.Replace(uri.Segments[uri.Segments.Count() - 1], "");
-                //else
-                //    SourceFolderPath = hardURI.LocalPath + siteURI.Host + @"\" + uri.AbsolutePath;
-         
                 SourceDataPath = hardURI.LocalPath + siteURI.Host + @"\" + uri.AbsolutePath;
+                SourceFolderPath = hardURI.LocalPath + siteURI.Host + @"\" + getSegments(uri);
             }
             else
             {
-                SourceFolderPath = hardURI.LocalPath + siteURI.Host + @"\" + uri.Host + uri.AbsolutePath.Replace(uri.Segments[uri.Segments.Count() - 1], "");
                 SourceDataPath = hardURI.LocalPath + siteURI.Host + @"\" + uri.Host + uri.AbsolutePath;
+                SourceFolderPath = hardURI.LocalPath + siteURI.Host + @"\" + uri.Host + getSegments(uri);
             }
 
-            
-            char[] charsToTrim = { '/', '\\'};
-            while(SourceDataPath[SourceDataPath.Length-1] == '/' || SourceDataPath[SourceDataPath.Length-1] == '\\')
+            char[] charsToTrim = { '/', '\\' };
+            while (SourceDataPath[SourceDataPath.Length - 1] == '/' || SourceDataPath[SourceDataPath.Length - 1] == '\\')
             {
                 SourceDataPath = SourceDataPath.TrimEnd(charsToTrim);
             }
-            
 
-
-            if (!Directory.Exists(SourceFolderPath))
-            {
-                Directory.CreateDirectory(SourceFolderPath);
-            }
+            if (!Directory.Exists(SourceDataPath))
+                Directory.CreateDirectory(SourceDataPath);
 
             switch (fileType)
             {
                 case "image": //SourceDataPath = fileName;
                     break;
-                //case "text/less": filePath = fileName + ".less";
-                //    break;
-                //case "text/css": filePath = fileName + ".css";
-                //    break;
-                //case "application/x-javascript": filePath = fileName + ".js";
-                //    break;
+                case "text/less": SourceDataPath = SourceDataPath + ".less";
+                    break;
+                case "text/css": SourceDataPath = SourceDataPath + ".css";
+                    break;
+                case "application/x-javascript": SourceDataPath = SourceDataPath + ".js";
+                    break;
                 default: SourceDataPath = SourceDataPath + ".html";
                     break;
             }
 
             return SourceDataPath;
+        }     
+        public static string getSegments(Uri uri)
+        {
+            string result = "";
+            for (int i = 0; i < uri.Segments.Count()-1; i++)
+                result += uri.Segments[i];
+            return result;
         }
     }
 }

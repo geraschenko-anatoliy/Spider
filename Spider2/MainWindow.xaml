@@ -16,7 +16,7 @@
             </Grid.RowDefinitions>
 
         <TextBox
-            Name="Links"
+            Name="LinksTB"
             Grid.Column="0"
             Grid.Row="2"
             ></TextBox>

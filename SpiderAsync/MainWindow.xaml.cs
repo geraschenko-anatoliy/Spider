@@ -352,7 +352,6 @@ namespace SpiderAsync
             else lParsedLinks.Add(page_adress + " " + nodeType + " " + attributeType);
             await Task.Run(async () =>
             {
-
                 HashSet<string> temp_data = new HashSet<string>();
 
                 try

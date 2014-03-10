@@ -7,78 +7,59 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Spider2
 {
     public class Downloader
     {
-        //public Uri siteURI = new Uri("http://football.ua");
-        //public Uri hardURI = new Uri("D:/");
-        //public static HashSet<Uri> htmls;
-        //public BlockingCollection<string> col = new BlockingCollection<string>();
-
-        public async static Task<string> Download(Uri uri, string filePath, string fileType)
+        public async static Task<string> Download(Uri uri, Uri sUri, Uri hUri, string fileType)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri.AbsoluteUri);
-            HttpWebResponse response = (HttpWebResponse)(await request.GetResponseAsync());
+            string filePath = HDDWorker.PrepareHDD(uri, sUri, hUri, fileType, false);
+            string path = uri.AbsoluteUri;
 
-            if ((response.StatusCode == HttpStatusCode.OK ||
-                        response.StatusCode == HttpStatusCode.Moved ||
-                        response.StatusCode == HttpStatusCode.Redirect) &&
-                        response.ContentType.StartsWith(fileType, StringComparison.OrdinalIgnoreCase))
+            if (fileType == null)
+                return null;
+
+            try
             {
-                await Task.Run(async () =>
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(path);
+                HttpWebResponse response = (HttpWebResponse)(await request.GetResponseAsync());
+
+                if ((response.StatusCode == HttpStatusCode.OK ||
+                            response.StatusCode == HttpStatusCode.Moved ||
+                            response.StatusCode == HttpStatusCode.Redirect) &&
+                            response.ContentType.StartsWith(fileType, StringComparison.OrdinalIgnoreCase))
                 {
-                    using (Stream inputStream = response.GetResponseStream())
-                    using (Stream outputStream = File.OpenWrite(filePath.TrimEnd('/')))
+                    await Task.Run(async () =>
                     {
-                        byte[] buffer = new byte[4096];
-                        int bytesRead;
-                        do
+                        using (Stream inputStream = response.GetResponseStream())
+                        using (Stream outputStream = File.OpenWrite(filePath.TrimEnd('/')))
                         {
-                            bytesRead = await inputStream.ReadAsync(buffer, 0, buffer.Length);
-                            await outputStream.WriteAsync(buffer, 0, bytesRead);
-                        } while (bytesRead != 0);
-                    }
-                });
+                            byte[] buffer = new byte[4096];
+                            int bytesRead;
+                            do
+                            {
+                                bytesRead = await inputStream.ReadAsync(buffer, 0, buffer.Length);
+                                await outputStream.WriteAsync(buffer, 0, bytesRead);
+                            } while (bytesRead != 0);
+                        }
+                    });
+                }
+                else
+                {
+
+                }
             }
-            else
+            catch (Exception ex)
             {
-                //error 
+                MessageBox.Show("Downloader " + ex.Message + " " + uri.AbsoluteUri);
             }
-            return uri.AbsolutePath;
+
+            lock (Supernumerary.dLocker)
+                Supernumerary.dCounter++;
+            
+            return null;
         }
-
-        //public async Task<int> SimpleDownload(Uri uri, string fileType, string filePath)
-        //{
-        //    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
-        //    HttpWebResponse response = (HttpWebResponse)(await request.GetResponseAsync());
-
-        //    if ((response.StatusCode == HttpStatusCode.OK ||
-        //            response.StatusCode == HttpStatusCode.Moved ||
-        //            response.StatusCode == HttpStatusCode.Redirect) &&
-        //            response.ContentType.StartsWith(fileType, StringComparison.OrdinalIgnoreCase))
-        //    {
-        //        await Task.Run(async () =>
-        //        {
-        //            using (Stream inputStream = response.GetResponseStream())
-        //            using (Stream outputStream = File.OpenWrite(filePath))
-        //            {
-        //                byte[] buffer = new byte[4096];
-        //                int bytesRead;
-        //                do
-        //                {
-        //                    bytesRead = await inputStream.ReadAsync(buffer, 0, buffer.Length);
-        //                    await outputStream.WriteAsync(buffer, 0, bytesRead);
-        //                } while (bytesRead != 0);
-        //            }
-        //        });
-        //    }
-        //    else
-        //    {
-        //        //LErrorList.Add(string.Format("Function - ProcessURL, current item - {0}, error message - Error in response, {1}, {2}", url, response.StatusCode, response.ContentType));
-        //    }
-        //    return 1;
-        //}
     }
 }

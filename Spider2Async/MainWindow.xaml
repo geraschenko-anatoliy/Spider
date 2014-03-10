@@ -1,0 +1,121 @@
+﻿<Window x:Class="Spider2Async.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="500" Width="525">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="15*"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Button 
+            Name="DownloadBtn"
+            Content="Скачать"
+            Grid.Row="0"
+            Grid.Column="0"
+            Click="DownloadBtn_Click">
+        </Button>
+        <Button 
+            Name="StopBtn"
+            Content="Остановить"
+            Grid.Row="0"
+            Grid.Column="1"
+            Click="StopBtn_Click">
+        </Button>
+        <Button 
+            Name="CancelBtn"
+            Content="Отменить"
+            Grid.Row="0"
+            Grid.Column="2">
+        </Button>
+
+        <TextBox
+            Name="pathTB"
+            Grid.Row="1"
+            Grid.Column="0"
+            FontSize="16"
+            VerticalContentAlignment="Center"
+            Text="http://appclub.im"
+            ></TextBox>
+        <ComboBox 
+            Name="DownloadingDepthCB"
+            Grid.Column="1"
+            Grid.Row="1"
+            IsEditable="False"
+            SelectedIndex="0"
+            >
+            <ComboBoxItem>0</ComboBoxItem>
+            <ComboBoxItem>1</ComboBoxItem>
+            <ComboBoxItem>2</ComboBoxItem>
+            <ComboBoxItem>3</ComboBoxItem>
+            <ComboBoxItem>4</ComboBoxItem>
+            <ComboBoxItem>Бесконечность</ComboBoxItem>
+        </ComboBox>
+        <!--<ComboBox 
+            Name="ExternalLinksCB"
+            Grid.Column="2"
+            Grid.Row="1"
+            IsEditable="False"
+            >
+            <ComboBoxItem>0</ComboBoxItem>
+            <ComboBoxItem>1</ComboBoxItem>
+        </ComboBox>-->
+
+        <TextBox
+            Name="globalPathTB" 
+            Grid.Column="2"
+            Grid.Row="1"
+            FontSize="16"
+            VerticalContentAlignment="Center"
+            Text="D://DownloadedSites/"
+            >
+        </TextBox>
+
+
+        <TextBox
+            Name="ErrorsTB"
+            Grid.Row="2"
+            Grid.Column="1"
+            ></TextBox>
+        <TextBox               
+            Name="LinksTB"
+            Grid.Row="2"
+            Grid.Column="0">
+        </TextBox>
+        <TextBox
+            Name="ResoursesTB"
+            Grid.Row="2"
+            Grid.Column="2">
+        </TextBox>
+        <TextBox
+            Name="nLinksTB"
+            Text="Скачано страниц - "
+            VerticalAlignment="Center"
+            Grid.Row="3"
+            Grid.Column="0">
+        </TextBox>
+        <TextBox
+            Name="nErrorsTB"
+            Text="Ошибок - "
+            VerticalAlignment="Center"
+            Grid.Row="3"
+            Grid.Column="1">
+        </TextBox>
+        <TextBox
+            Name="nSourceTB"
+            Text="Скачано ресурсов - "
+            VerticalAlignment="Center"
+            Grid.Row="3"
+            Grid.Column="2">
+        </TextBox>
+
+    </Grid>
+</Window>
