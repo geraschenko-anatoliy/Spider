@@ -10,6 +10,7 @@ using System.Windows.Threading;
 
 namespace Spider2Async
 {
+   // public static enum counter {errors, resources, htmls};
     class Supernumerary
     {
         public static readonly object dLocker = new object();
@@ -39,15 +40,17 @@ namespace Spider2Async
             downloadedPages = new StringBuilder();
             downloadedResources = new StringBuilder();
 
+            errors_counter = 0;
+            resources_counter = 0;
+            html_counter = 0;
+
             downloadedUris = new BlockingCollection<Uri>();
 
             external_depth = 0;
             depth = 0;
-            errors_counter = 0;
-            resources_counter = 0;
-            html_counter = 0;
+
+            CancellationTokenSource cts = new CancellationTokenSource();
+            CancellationToken token = cts.Token;
         }
-
-
     }
 }

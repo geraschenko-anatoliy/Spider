@@ -11,6 +11,7 @@ using System.Windows;
 
 namespace Spider2Async
 {
+    //Class for all parsing functions
     class HTMLParser
     {       
         public static async Task<HashSet<Uri>> GetOnlyHtmls(Uri uri)
@@ -35,13 +36,13 @@ namespace Spider2Async
                               .Select(e1 => e1.GetAttributeValue("href", null))
                               .Where(s => !String.IsNullOrEmpty(s));                   
 
-                          result = LinksToHashSet(htmls.ToList(), "//a[@href]", true);
+                          result = LinksToHashSet(htmls.ToList(), "//a[@href]");//, true);
 
                           ReplaceLinksAndSave(uri, doc);
                       }
                       catch (TaskCanceledException)
                       {
-                          Supernumerary.downloadedResources.AppendLine("Ошибка");
+                          Supernumerary.downloadedResources.AppendLine("Canceled");
                       }
                       catch (Exception ex)
                       {
@@ -71,23 +72,23 @@ namespace Spider2Async
                                .Select(e1 => e1.GetAttributeValue("src", null))
                                .Where(s => !String.IsNullOrEmpty(s));
 
-                           result.UnionWith(LinksToHashSet(images.ToList(), "img", false));
+                           result.UnionWith(LinksToHashSet(images.ToList(), "img"));//, false));
 
                            var css = doc.DocumentNode.Descendants("link")
                                .Select(e1 => e1.GetAttributeValue("href", null))
                                .Where(s => !String.IsNullOrEmpty(s));
 
-                           result.UnionWith(LinksToHashSet(css.ToList(), "link", false));
+                           result.UnionWith(LinksToHashSet(css.ToList(), "link"));//, false));
 
                            var scripts = doc.DocumentNode.Descendants("script")
                                .Select(e1 => e1.GetAttributeValue("src", null))
                                .Where(s => !String.IsNullOrEmpty(s));
 
-                           result.UnionWith(LinksToHashSet(scripts.ToList(), "script", false));
+                           result.UnionWith(LinksToHashSet(scripts.ToList(), "script"));//, false));
                        }
                        catch (TaskCanceledException)
                        {
-                           Supernumerary.downloadedResources.AppendLine("Отменено");
+                           Supernumerary.downloadedResources.AppendLine("Canceled");
                        }
                        catch (Exception ex)
                        {
@@ -129,7 +130,7 @@ namespace Spider2Async
                     foreach (var img in images)
                     {
                         Uri uri1 = new Uri(Supernumerary.siteURI, img.GetAttributeValue("src", null));
-                        img.SetAttributeValue("src", GetPath(uri1, false));
+                        img.SetAttributeValue("src", GetPath(uri1));
                     }
 
                     var csses = doc.DocumentNode.Descendants("link");
@@ -137,7 +138,7 @@ namespace Spider2Async
                     foreach (var css in csses)
                     {
                         Uri uri1 = new Uri(Supernumerary.siteURI, css.GetAttributeValue("href", null));
-                        css.SetAttributeValue("href", GetPath(uri1, false));
+                        css.SetAttributeValue("href", GetPath(uri1));
                     }
 
                     var scripts = doc.DocumentNode.Descendants("script");
@@ -145,7 +146,7 @@ namespace Spider2Async
                     foreach (var script in scripts)
                     {
                         Uri uri1 = new Uri(Supernumerary.siteURI, script.GetAttributeValue("src", null));
-                        script.SetAttributeValue("src", GetPath(uri1, false));
+                        script.SetAttributeValue("src", GetPath(uri1));
                     }
 
                     if (!File.Exists(path + ".html"))
@@ -158,7 +159,7 @@ namespace Spider2Async
                 }
                 catch (TaskCanceledException)
                 {
-                    Supernumerary.downloadedResources.AppendLine("Ошибка");
+                    Supernumerary.downloadedResources.AppendLine("Canceled");
                 }
                 catch (Exception ex)
                 {
@@ -179,7 +180,7 @@ namespace Spider2Async
                 {
                     Uri uri1 = new Uri(Supernumerary.siteURI, html.GetAttributeValue("href", null));
 
-                    html.SetAttributeValue("href", GetPath(uri1, false) + ".html");
+                    html.SetAttributeValue("href", GetPath(uri1) + ".html");
                 }
 
                 var images = doc.DocumentNode.Descendants("img");
@@ -187,7 +188,7 @@ namespace Spider2Async
                 foreach (var img in images)
                 {
                     Uri uri1 = new Uri(Supernumerary.siteURI, img.GetAttributeValue("src", null));
-                    img.SetAttributeValue("src", GetPath(uri1, false));
+                    img.SetAttributeValue("src", GetPath(uri1));
                 }
 
                 var csses = doc.DocumentNode.Descendants("link");
@@ -195,7 +196,7 @@ namespace Spider2Async
                 foreach (var css in csses)
                 {
                     Uri uri1 = new Uri(Supernumerary.siteURI, css.GetAttributeValue("href", null));
-                    css.SetAttributeValue("href", GetPath(uri1, false));
+                    css.SetAttributeValue("href", GetPath(uri1));
                 }
 
                 var scripts = doc.DocumentNode.Descendants("script");
@@ -203,7 +204,7 @@ namespace Spider2Async
                 foreach (var script in scripts)
                 {
                     Uri uri1 = new Uri(Supernumerary.siteURI, script.GetAttributeValue("src", null));
-                    script.SetAttributeValue("src", GetPath(uri1, false));
+                    script.SetAttributeValue("src", GetPath(uri1));
                 }
 
                 if (!File.Exists(path + ".html"))
@@ -220,7 +221,7 @@ namespace Spider2Async
                 Messenger.SentErrorMessage(ex, uri);
             }
         }
-        public static HashSet<Uri> LinksToHashSet(List<string> links, string nodeType, bool onlyHTMLs)
+        public static HashSet<Uri> LinksToHashSet(List<string> links, string nodeType)//, bool onlyHTMLs)
         { 
             HashSet<Uri> result = new HashSet<Uri>();
             try
@@ -272,7 +273,7 @@ namespace Spider2Async
         }
         static string ReplaceIllegalChars(string path)
         {
-            return path.Replace('?', '_').Replace(',', '_').Replace(':', '_');
+            return path.Replace('?', '_').Replace(',', '_').Replace(':', '_').Replace(':', '_');
         }
         public static string GetPath(Uri uri, bool onlypath = false)
         {

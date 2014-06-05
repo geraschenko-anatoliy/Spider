@@ -12,6 +12,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="15*"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
@@ -23,18 +24,18 @@
             Grid.Column="0"
             Click="DownloadBtn_Click">
         </Button>
+        <Label
+            Grid.Row="0"
+            Grid.Column="1"
+            Content="Выберите глубину скачивания"
+            HorizontalAlignment="Center">
+        </Label>
         <Button 
             Name="StopBtn"
             Content="Остановить"
             Grid.Row="0"
-            Grid.Column="1"
+            Grid.Column="2"
             Click="StopBtn_Click">
-        </Button>
-        <Button 
-            Name="CancelBtn"
-            Content="Отменить"
-            Grid.Row="0"
-            Grid.Column="2">
         </Button>
 
         <TextBox
@@ -59,15 +60,6 @@
             <ComboBoxItem>4</ComboBoxItem>
             <ComboBoxItem>Бесконечность</ComboBoxItem>
         </ComboBox>
-        <!--<ComboBox 
-            Name="ExternalLinksCB"
-            Grid.Column="2"
-            Grid.Row="1"
-            IsEditable="False"
-            >
-            <ComboBoxItem>0</ComboBoxItem>
-            <ComboBoxItem>1</ComboBoxItem>
-        </ComboBox>-->
 
         <TextBox
             Name="globalPathTB" 
@@ -79,41 +71,62 @@
             >
         </TextBox>
 
+        <Label
+            Grid.Row="2"
+            Grid.Column="0"
+            Content="Список скачанных HTML"
+            HorizontalAlignment="Center">
+        </Label>
+
+        <Label
+            Grid.Row="2"
+            Grid.Column="1"
+            Content="Список ошибок"
+            HorizontalAlignment="Center">
+        </Label>
+
+
+        <Label
+            Grid.Row="2"
+            Grid.Column="2"
+            Content="Список скачанных ресурсов"
+            HorizontalAlignment="Center">
+        </Label>
 
         <TextBox
             Name="ErrorsTB"
-            Grid.Row="2"
+            Grid.Row="3"
             Grid.Column="1"
             ></TextBox>
         <TextBox               
-            Name="LinksTB"
-            Grid.Row="2"
+            Name="HtmlsTB"
+            Grid.Row="3"
             Grid.Column="0">
         </TextBox>
         <TextBox
             Name="ResoursesTB"
-            Grid.Row="2"
+            Grid.Row="3"
             Grid.Column="2">
         </TextBox>
         <TextBox
-            Name="nLinksTB"
+            Name="nHtmlsTB"
             Text="Скачано страниц - "
             VerticalAlignment="Center"
-            Grid.Row="3"
+            Grid.Row="4"
             Grid.Column="0">
         </TextBox>
         <TextBox
             Name="nErrorsTB"
             Text="Ошибок - "
             VerticalAlignment="Center"
-            Grid.Row="3"
+            Grid.Row="4"
             Grid.Column="1">
         </TextBox>
         <TextBox
-            Name="nSourceTB"
+            Name="nResourcesTB"
             Text="Скачано ресурсов - "
             VerticalAlignment="Center"
-            Grid.Row="3"
+            Grid.Row="4"
             Grid.Column="2">
         </TextBox>
 

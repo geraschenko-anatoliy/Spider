@@ -13,33 +13,86 @@ using System.Windows.Threading;
 
 namespace Spider2Async
 {
+    // Class for all downloading functions
     public class Downloader
     {
-        public static Exception ex;
+        //Recursive func for site downloading
+        public async static Task<int> RecursiveDownloading(Uri uri, int depth)
+        {
+            try
+            {
+                if (depth == 0)
+                {
+                    await DownloadHTMLs(uri);
+
+                    return 0;
+                }
+                if (depth > 0)
+                {
+                    foreach (var item in await HTMLParser.GetOnlyHtmls(uri))
+                    {
+                        await RecursiveDownloading(item, depth - 1);
+
+                        if (!Supernumerary.downloadedUris.Contains(uri))
+                            await DownloadHTMLs(uri);
+                    }
+                    return 0;
+                }
+            }
+            catch (System.OperationCanceledException)
+            {
+                //Downloading canceled
+                return -1;
+            }
+            catch (System.Exception)
+            {
+                //Downloading failed"
+                return -2; // 
+            }
+            //Downloaded successfully
+            return 0; 
+        }
+
+        //Downloading HTML
+        public async static Task<int> DownloadHTMLs(Uri uri)
+        {
+            await HTMLParser.ReplaceLinksAndSave(uri);
+
+            IEnumerable<Uri> urlList = await HTMLParser.GetResourses(uri);
+
+            var downloadResoursesTasks = (from temp_uri in urlList select Downloader.DownloadResources(temp_uri)).ToList();
+
+            while (downloadResoursesTasks.Any())
+            {
+                Task<string> firstFinishedTask = await Task.WhenAny(downloadResoursesTasks);
+
+                downloadResoursesTasks.Remove(firstFinishedTask);
+            }
+            return 1;
+        }
+
+        //Downloading resourses for current HTML
         public async static Task<string> DownloadResources(Uri uri, int repeat = 5)
         {
             string filePath = HTMLParser.GetPath(uri);
 
+            if (!File.Exists(filePath))
             try
             {
                 HttpClient client = new HttpClient();
-
+                Exception ex = new Exception();
                 bool success = false;
                 do
                 {
-                    // Send asynchronous request
                     await client.GetAsync(uri.AbsoluteUri, Supernumerary.token).ContinueWith(
                         (requestTask) =>
                         {
-                            // Get HTTP response from completed task.
                             try
                             {
                                 HttpResponseMessage response = requestTask.Result;
 
-                                // Check that response was successful or throw exception
                                 response.EnsureSuccessStatusCode();
 
-                                // Read response asynchronously and save to file
                                 response.Content.ReadAsFileAsync(filePath, true);
 
                                 Supernumerary.downloadedResources = Supernumerary.downloadedResources.AppendLine(uri.AbsoluteUri);
@@ -59,7 +112,6 @@ namespace Spider2Async
                         }, Supernumerary.token);
                 } while (repeat > 0 && !success);
 
-
                 if (repeat == 0)
                 {
                     Messenger.SentErrorMessage(ex, uri);
@@ -68,70 +120,14 @@ namespace Spider2Async
             }
             catch (TaskCanceledException)
             {
-                Supernumerary.downloadedResources.AppendLine("Ошибка");
+                Supernumerary.downloadedResources.AppendLine("Canceled");
             }
-            //catch (System.OperationCanceledException)
-            //{
-            //    Supernumerary.downloadedPages.AppendLine("Downloading canceled");
-            //    Supernumerary.downloadedResources.AppendLine("Downloading canceled");
-            //}
             catch (Exception ex)
             {
                 Messenger.SentErrorMessage(ex, uri);
             }
             return null;
         }
-        public async static Task<int> RecursiveDownloading(Uri uri, int depth)
-        {
-            try
-            {
-                if (depth == 0)
-                {
-                    await DownloadHTMLs(uri);
-
-                    return -1;
-                }
-                if (depth > 0)
-                {
-                    foreach (var item in await HTMLParser.GetOnlyHtmls(uri))
-                    {
-                        await RecursiveDownloading(item, depth - 1);
-
-                        if (!Supernumerary.downloadedUris.Contains(uri))
-                            await DownloadHTMLs(uri);
-                    }
-                    return depth - 1;
-                }
-            }
-            catch (System.OperationCanceledException)
-            {
-                //MessageBox.Show("Downloading canceled");
-                return -2;
-            }
-            catch (System.Exception)
-            {
-                //MessageBox.Show("Downloading failed");
-                return -1; // 
-            }
-            //MessageBox.Show("Downloaded successfully");
-            return -2; 
-        }
-        public async static Task<int> DownloadHTMLs(Uri uri)
-        {
-            await HTMLParser.ReplaceLinksAndSave(uri);
-
-            IEnumerable<Uri> urlList = await HTMLParser.GetResourses(uri);
-
-            var downloadResoursesTasks = (from temp_uri in urlList select Downloader.DownloadResources(temp_uri)).ToList();
-
-            while (downloadResoursesTasks.Any())
-            {
-                Task<string> firstFinishedTask = await Task.WhenAny(downloadResoursesTasks);
-
-                downloadResoursesTasks.Remove(firstFinishedTask);
-            }
-
-            return 1;
-        }
+    
     }    
 }

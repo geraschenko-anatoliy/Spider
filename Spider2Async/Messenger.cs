@@ -9,6 +9,7 @@ using System.Windows.Threading;
 
 namespace Spider2Async
 {
+    //Class for messages from tasks to UI controls
     public static class Messenger
     {
         public static DispatcherTimer dispatcherTimer = new DispatcherTimer();
@@ -22,12 +23,12 @@ namespace Spider2Async
         {
             lock (Supernumerary.downloadedPages)
             {
-                Supernumerary.mainWindow.LinksTB.Text = Supernumerary.downloadedPages + Supernumerary.mainWindow.LinksTB.Text;
+                Supernumerary.mainWindow.HtmlsTB.Text = Supernumerary.downloadedPages + Supernumerary.mainWindow.HtmlsTB.Text;
                 Supernumerary.mainWindow.ResoursesTB.Text = Supernumerary.downloadedResources + Supernumerary.mainWindow.ResoursesTB.Text;
-                
-                Supernumerary.mainWindow.nLinksTB.Text = Supernumerary.html_counter.ToString();
+
+                Supernumerary.mainWindow.nHtmlsTB.Text = Supernumerary.html_counter.ToString(); 
                 Supernumerary.mainWindow.nErrorsTB.Text = Supernumerary.errors_counter.ToString();
-                Supernumerary.mainWindow.nSourceTB.Text = Supernumerary.resources_counter.ToString();
+                Supernumerary.mainWindow.nResourcesTB.Text = Supernumerary.resources_counter.ToString();
 
                 Supernumerary.downloadedPages.Clear();
                 Supernumerary.downloadedResources.Clear();
@@ -51,6 +52,17 @@ namespace Spider2Async
             {
                 MessageBox.Show(main_ex.Message);
             }
+        }
+
+        public static void ResetTB()
+        {
+            Supernumerary.mainWindow.HtmlsTB.Text = String.Empty;
+            Supernumerary.mainWindow.ResoursesTB.Text = String.Empty; 
+            Supernumerary.mainWindow.ErrorsTB.Text = String.Empty;
+
+            Supernumerary.mainWindow.nErrorsTB.Text = "0";
+            Supernumerary.mainWindow.nHtmlsTB.Text = "0";
+            Supernumerary.mainWindow.nResourcesTB.Text = "0";
         }
     }
 }

@@ -27,15 +27,32 @@ namespace Spider2Async
         private async void DownloadBtn_Click(object sender, RoutedEventArgs e)
         {
             Supernumerary.ResetToDefault();
-            Supernumerary.depth = GetDepth();
+            Messenger.ResetTB();
 
+            Supernumerary.depth = GetDepth();
             Supernumerary.siteURI = new Uri(pathTB.Text);
             Supernumerary.hPath = System.IO.Path.Combine(globalPathTB.Text, Supernumerary.siteURI.Host);
 
             Messenger.StartDispatcher();
 
             int download_result = await  Downloader.RecursiveDownloading(Supernumerary.siteURI, Supernumerary.depth);
-            MessageBox.Show("Конец работы");
+            ResultProcessing(download_result);
+        }
+
+        private void ResultProcessing(int download_result)
+        {
+            switch (download_result)
+            {
+                case 0: 
+                    MessageBox.Show("Download successfully");
+                    break;
+                case -1:
+                    MessageBox.Show("Downloading canceled");
+                    break;
+                case -2:
+                    MessageBox.Show("Downloading failed");
+                    break;
+            }
         }
         private void StopBtn_Click(object sender, RoutedEventArgs e)
         {
